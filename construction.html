@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ironclad Build Co.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500&family=Barlow+Condensed:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0d0c0a;
+      --dark: #151410;
+      --steel: #1e1c18;
+      --orange: #e8621a;
+      --orange-dim: #b34d12;
+      --tan: #c4a882;
+      --light: #f2ede6;
+      --muted: #7a7060;
+      --border: #2a2820;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--light);
+      font-family: 'Barlow', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+      background: rgba(13,12,10,0.95);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      animation: fadeDown 0.6s ease 0.2s forwards;
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 0.08em;
+      color: var(--light);
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--orange); }
+
+    nav ul { list-style: none; display: flex; gap: 40px; align-items: center; }
+
+    nav ul a {
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    nav ul a:hover { color: var(--light); }
+
+    .nav-cta {
+      background: var(--orange) !important;
+      color: var(--black) !important;
+      padding: 10px 22px;
+      font-weight: 600 !important;
+      transition: background 0.2s !important;
+    }
+
+    .nav-cta:hover { background: var(--orange-dim) !important; color: var(--light) !important; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      position: relative;
+      overflow: hidden;
+      padding-top: 80px;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(13,12,10,0.3) 0%, rgba(13,12,10,0.85) 100%),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 60px,
+          rgba(255,255,255,0.015) 60px,
+          rgba(255,255,255,0.015) 61px
+        ),
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 60px,
+          rgba(255,255,255,0.015) 60px,
+          rgba(255,255,255,0.015) 61px
+        );
+      background-color: #1a1208;
+    }
+
+    .hero-accent {
+      position: absolute;
+      top: 0; left: 0;
+      width: 6px;
+      height: 100%;
+      background: var(--orange);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 60px;
+      max-width: 900px;
+      opacity: 0;
+      animation: fadeUp 0.9s ease 0.5s forwards;
+    }
+
+    .hero-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .hero-tag::after {
+      content: '';
+      display: block;
+      width: 48px;
+      height: 2px;
+      background: var(--orange);
+    }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(72px, 12vw, 160px);
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+      margin-bottom: 32px;
+    }
+
+    h1 .line2 { color: var(--orange); }
+    h1 .line3 { color: var(--muted); font-size: 0.55em; letter-spacing: 0.08em; }
+
+    .hero-sub {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.8;
+      max-width: 500px;
+      margin-bottom: 48px;
+    }
+
+    .hero-btns { display: flex; gap: 16px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 32px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary { background: var(--orange); color: var(--black); }
+    .btn-primary:hover { background: var(--orange-dim); }
+
+    .btn-outline { background: transparent; color: var(--light); border: 1px solid var(--border); }
+    .btn-outline:hover { border-color: var(--orange); color: var(--orange); }
+
+    .hero-stats {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--border);
+      opacity: 0;
+      animation: fadeUp 0.9s ease 0.8s forwards;
+    }
+
+    .stat {
+      padding: 32px 60px;
+      border-right: 1px solid var(--border);
+    }
+
+    .stat:last-child { border-right: none; }
+
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      color: var(--orange);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ── SERVICES ── */
+    #services {
+      padding: 120px 60px;
+      background: var(--dark);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 72px;
+    }
+
+    .section-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(40px, 5vw, 64px);
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: var(--border);
+    }
+
+    .service-card {
+      background: var(--steel);
+      padding: 52px 44px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 3px;
+      background: var(--orange);
+      transition: width 0.4s ease;
+    }
+
+    .service-card:hover { background: #222018; }
+    .service-card:hover::before { width: 100%; }
+
+    .service-icon {
+      font-size: 32px;
+      margin-bottom: 28px;
+      display: block;
+    }
+
+    .service-card h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 0.06em;
+      margin-bottom: 14px;
+      color: var(--light);
+    }
+
+    .service-card p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .service-num {
+      position: absolute;
+      top: 24px; right: 28px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 64px;
+      color: rgba(255,255,255,0.03);
+      line-height: 1;
+    }
+
+    /* ── PROJECTS ── */
+    #projects { padding: 120px 60px; background: var(--black); }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 3px;
+      margin-top: 72px;
+    }
+
+    .project-card {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .project-card:first-child {
+      grid-row: span 2;
+    }
+
+    .project-visual {
+      width: 100%;
+      height: 100%;
+      min-height: 300px;
+      display: flex;
+      align-items: flex-end;
+      padding: 36px;
+      position: relative;
+      transition: transform 0.5s ease;
+    }
+
+    .project-card:hover .project-visual { transform: scale(1.03); }
+
+    .pv-1 {
+      background: linear-gradient(160deg, #2a1f0e 0%, #1a1208 60%, #0d0c0a 100%);
+      min-height: 600px;
+    }
+
+    .pv-2 { background: linear-gradient(135deg, #1c1a14 0%, #0f0e0b 100%); min-height: 280px; }
+    .pv-3 { background: linear-gradient(135deg, #221e14 0%, #151210 100%); min-height: 280px; }
+
+    .pv-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(40px, 6vw, 90px);
+      color: rgba(255,255,255,0.04);
+      letter-spacing: 0.06em;
+      line-height: 1;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .project-info {
+      position: relative;
+      z-index: 2;
+    }
+
+    .project-info h4 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+
+    .project-info span {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--orange);
+    }
+
+    .project-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(13,12,10,0.9) 0%, transparent 60%);
+    }
+
+    /* ── WHY ── */
+    #why {
+      padding: 120px 60px;
+      background: var(--orange);
+      color: var(--black);
+    }
+
+    #why h2 { color: var(--black); }
+    #why .section-tag { color: rgba(0,0,0,0.5); }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 48px;
+      margin-top: 72px;
+    }
+
+    .why-item h4 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+      color: var(--black);
+    }
+
+    .why-item p {
+      font-size: 14px;
+      line-height: 1.8;
+      color: rgba(0,0,0,0.6);
+    }
+
+    .why-divider {
+      width: 32px;
+      height: 3px;
+      background: var(--black);
+      margin-bottom: 20px;
+      opacity: 0.3;
+    }
+
+    /* ── CONTACT ── */
+    #contact {
+      padding: 120px 60px;
+      background: var(--steel);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 100px;
+      align-items: start;
+    }
+
+    .contact-left h2 { margin-bottom: 20px; }
+
+    .contact-left p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.9;
+      margin-bottom: 48px;
+    }
+
+    .contact-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .contact-detail a {
+      color: var(--light);
+      text-decoration: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: color 0.2s;
+    }
+
+    .contact-detail a span { color: var(--orange); font-size: 18px; }
+    .contact-detail a:hover { color: var(--orange); }
+
+    .contact-form { display: flex; flex-direction: column; gap: 20px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .field { display: flex; flex-direction: column; gap: 8px; }
+
+    .field label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .field input, .field textarea, .field select {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--light);
+      padding: 14px 18px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      resize: none;
+      appearance: none;
+    }
+
+    .field input:focus, .field textarea:focus, .field select:focus {
+      border-color: var(--orange);
+    }
+
+    .field input::placeholder, .field textarea::placeholder { color: rgba(255,255,255,0.15); }
+    .field textarea { height: 130px; }
+
+    .field select option { background: var(--steel); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--black);
+      border-top: 1px solid var(--border);
+      padding: 40px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    footer .logo { font-size: 22px; }
+
+    footer p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 18px 24px; }
+      nav ul { display: none; }
+      #services, #projects, #contact, #why { padding: 80px 24px; }
+      .hero-content { padding: 0 24px; }
+      .hero-stats { grid-template-columns: repeat(2, 1fr); }
+      .stat { padding: 24px; }
+      .services-grid { grid-template-columns: 1fr; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .project-card:first-child { grid-row: span 1; }
+      .pv-1 { min-height: 300px; }
+      .why-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+      #contact { grid-template-columns: 1fr; gap: 48px; }
+      .form-row { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+      .section-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="logo">Ironclad <span>Build Co.</span></a>
+    <ul>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#why">Why Us</a></li>
+      <li><a href="#contact" class="nav-cta">Get a Quote</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-accent"></div>
+    <div class="hero-content">
+      <div class="hero-tag">Licensed & Insured · Las Vegas, NV</div>
+      <h1>
+        WE<br>
+        <span class="line2">BUILD</span><br>
+        <span class="line3">WHAT OTHERS WON'T</span>
+      </h1>
+      <p class="hero-sub">Commercial and residential construction done right — on time, on budget, no excuses. From ground-up builds to full renovations.</p>
+      <div class="hero-btns">
+        <a href="#contact" class="btn btn-primary">Get a Free Quote</a>
+        <a href="#projects" class="btn btn-outline">Our Work</a>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">18+</div>
+        <div class="stat-label">Years in Business</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">340</div>
+        <div class="stat-label">Projects Completed</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Licensed & Insured</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">4.9★</div>
+        <div class="stat-label">Client Rating</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="section-header reveal">
+      <div>
+        <div class="section-tag">What We Do</div>
+        <h2>Our Services</h2>
+      </div>
+      <a href="#contact" class="btn btn-outline">Request a Quote</a>
+    </div>
+    <div class="services-grid reveal">
+      <div class="service-card">
+        <div class="service-num">01</div>
+        <span class="service-icon">🏗️</span>
+        <h3>New Construction</h3>
+        <p>Ground-up commercial and residential builds. We handle everything from permits to final walkthrough.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">02</div>
+        <span class="service-icon">🔨</span>
+        <h3>Renovation & Remodel</h3>
+        <p>Full-scale interior and exterior renovations. Kitchens, baths, additions, structural changes — no job too complex.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">03</div>
+        <span class="service-icon">🏢</span>
+        <h3>Commercial Buildout</h3>
+        <p>Retail, office, and industrial spaces built to spec. We work around your timeline to minimize downtime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="section-header reveal">
+      <div>
+        <div class="section-tag">Portfolio</div>
+        <h2>Recent Projects</h2>
+      </div>
+    </div>
+    <div class="projects-grid reveal">
+      <div class="project-card">
+        <div class="project-visual pv-1">
+          <div class="pv-label">WAREHOUSE</div>
+          <div class="project-overlay"></div>
+          <div class="project-info">
+            <h4>Eastside Warehouse Complex</h4>
+            <span>Commercial · New Build · 2024</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-visual pv-2">
+          <div class="pv-label">RENO</div>
+          <div class="project-overlay"></div>
+          <div class="project-info">
+            <h4>Henderson Luxury Remodel</h4>
+            <span>Residential · Renovation · 2024</span>
+          </div>
+        </div>
+      </div>
+      <div class="project-card">
+        <div class="project-visual pv-3">
+          <div class="pv-label">RETAIL</div>
+          <div class="project-overlay"></div>
+          <div class="project-info">
+            <h4>Summerlin Retail Buildout</h4>
+            <span>Commercial · Buildout · 2023</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section id="why">
+    <div class="section-header reveal">
+      <div>
+        <div class="section-tag">Why Ironclad</div>
+        <h2>Built Different</h2>
+      </div>
+    </div>
+    <div class="why-grid reveal">
+      <div class="why-item">
+        <div class="why-divider"></div>
+        <h4>No Subcontractor Runaround</h4>
+        <p>Our crews are in-house. No middlemen, no delays from third-party scheduling.</p>
+      </div>
+      <div class="why-item">
+        <div class="why-divider"></div>
+        <h4>Fixed-Price Quotes</h4>
+        <p>We quote it, we stick to it. No surprise invoices when the job is done.</p>
+      </div>
+      <div class="why-item">
+        <div class="why-divider"></div>
+        <h4>On-Time Guarantee</h4>
+        <p>We've hit our deadline on 96% of projects. We treat your timeline like it's ours.</p>
+      </div>
+      <div class="why-item">
+        <div class="why-divider"></div>
+        <h4>10-Year Workmanship Warranty</h4>
+        <p>We stand behind everything we build. If something's wrong, we fix it — period.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="contact-left reveal">
+      <div class="section-tag">Contact</div>
+      <h2>Let's Build<br>Something.</h2>
+      <p>Tell us about your project and we'll get back to you within 24 hours with a free estimate.</p>
+      <div class="contact-detail">
+        <a href="tel:+17025550100"><span>📞</span> (702) 555-0100</a>
+        <a href="mailto:info@ironclad.build"><span>✉️</span> info@ironclad.build</a>
+        <a href="#"><span>📍</span> Las Vegas, NV — Serving All of Clark County</a>
+      </div>
+    </div>
+    <div class="contact-form reveal">
+      <div class="form-row">
+        <div class="field">
+          <label>First Name</label>
+          <input type="text" placeholder="John"/>
+        </div>
+        <div class="field">
+          <label>Last Name</label>
+          <input type="text" placeholder="Smith"/>
+        </div>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" placeholder="john@email.com"/>
+      </div>
+      <div class="field">
+        <label>Project Type</label>
+        <select>
+          <option value="" disabled selected>Select a service</option>
+          <option>New Construction</option>
+          <option>Renovation / Remodel</option>
+          <option>Commercial Buildout</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Project Details</label>
+        <textarea placeholder="Tell us about your project, timeline, and budget..."></textarea>
+      </div>
+      <button class="btn btn-primary">Request Free Quote →</button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <a href="#" class="logo">Ironclad <span>Build Co.</span></a>
+    <p>© 2026 Ironclad Build Co. · Las Vegas, NV · Licensed & Insured</p>
+  </footer>
+
+  <script>
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 100);
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

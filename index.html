@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>JT Creations</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+```
+:root {
+--bg: #f5f3ef;
+--ink: #1a1916;
+--muted: #8a8780;
+--accent: #c8a96e;
+--border: #dedad4;
+--white: #ffffff;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+background: var(--bg);
+color: var(--ink);
+font-family: 'DM Mono', monospace;
+font-weight: 300;
+font-size: 13px;
+line-height: 1.7;
+overflow-x: hidden;
+}
+
+/* ── NAV ── */
+nav {
+position: fixed;
+top: 0; left: 0; right: 0;
+z-index: 100;
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 24px 48px;
+background: var(--bg);
+border-bottom: 1px solid var(--border);
+opacity: 0;
+animation: fadeDown 0.8s ease 0.1s forwards;
+}
+
+.logo {
+font-family: 'Cormorant Garamond', serif;
+font-size: 22px;
+font-weight: 400;
+letter-spacing: 0.04em;
+color: var(--ink);
+text-decoration: none;
+}
+
+.logo span { color: var(--accent); }
+
+nav ul {
+list-style: none;
+display: flex;
+gap: 40px;
+}
+
+nav ul a {
+color: var(--muted);
+text-decoration: none;
+font-size: 11px;
+letter-spacing: 0.12em;
+text-transform: uppercase;
+transition: color 0.2s;
+}
+
+nav ul a:hover { color: var(--ink); }
+
+/* ── HERO ── */
+.hero {
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+justify-content: flex-end;
+padding: 0 48px 80px;
+position: relative;
+overflow: hidden;
+}
+
+.hero-bg-text {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+font-family: 'Cormorant Garamond', serif;
+font-size: clamp(100px, 18vw, 260px);
+font-weight: 300;
+color: transparent;
+-webkit-text-stroke: 1px var(--border);
+white-space: nowrap;
+pointer-events: none;
+user-select: none;
+opacity: 0;
+animation: fadeIn 1.2s ease 0.4s forwards;
+}
+
+.hero-content {
+position: relative;
+z-index: 2;
+max-width: 640px;
+opacity: 0;
+animation: fadeUp 0.9s ease 0.6s forwards;
+}
+
+.hero-tag {
+font-size: 11px;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+color: var(--accent);
+margin-bottom: 24px;
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.hero-tag::before {
+content: '';
+display: block;
+width: 32px;
+height: 1px;
+background: var(--accent);
+}
+
+h1 {
+font-family: 'Cormorant Garamond', serif;
+font-size: clamp(42px, 6vw, 72px);
+font-weight: 300;
+line-height: 1.1;
+letter-spacing: -0.01em;
+margin-bottom: 28px;
+}
+
+h1 em {
+font-style: italic;
+color: var(--muted);
+}
+
+.hero-sub {
+color: var(--muted);
+max-width: 460px;
+margin-bottom: 48px;
+}
+
+.btn {
+display: inline-flex;
+align-items: center;
+gap: 12px;
+padding: 14px 28px;
+background: var(--ink);
+color: var(--bg);
+text-decoration: none;
+font-size: 11px;
+letter-spacing: 0.12em;
+text-transform: uppercase;
+transition: background 0.2s, color 0.2s;
+}
+
+.btn:hover { background: var(--accent); color: var(--white); }
+
+.btn-ghost {
+background: transparent;
+color: var(--ink);
+border: 1px solid var(--border);
+}
+
+.btn-ghost:hover { background: var(--ink); color: var(--bg); }
+
+.hero-btns { display: flex; gap: 16px; flex-wrap: wrap; }
+
+/* ── SECTION SHARED ── */
+section { padding: 120px 48px; }
+
+.section-label {
+font-size: 11px;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+color: var(--accent);
+margin-bottom: 16px;
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.section-label::before {
+content: '';
+display: block;
+width: 32px;
+height: 1px;
+background: var(--accent);
+}
+
+h2 {
+font-family: 'Cormorant Garamond', serif;
+font-size: clamp(32px, 4vw, 52px);
+font-weight: 300;
+line-height: 1.15;
+margin-bottom: 20px;
+}
+
+/* ── SERVICES ── */
+#services {
+background: var(--white);
+border-top: 1px solid var(--border);
+border-bottom: 1px solid var(--border);
+}
+
+.services-header {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 80px;
+align-items: end;
+margin-bottom: 80px;
+}
+
+.services-intro {
+color: var(--muted);
+max-width: 380px;
+}
+
+.services-grid {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 1px;
+background: var(--border);
+}
+
+.service-card {
+background: var(--white);
+padding: 48px 40px;
+transition: background 0.2s;
+cursor: default;
+}
+
+.service-card:hover { background: var(--bg); }
+
+.service-num {
+font-size: 11px;
+color: var(--accent);
+letter-spacing: 0.1em;
+margin-bottom: 32px;
+}
+
+.service-card h3 {
+font-family: 'Cormorant Garamond', serif;
+font-size: 24px;
+font-weight: 400;
+margin-bottom: 16px;
+}
+
+.service-card p { color: var(--muted); line-height: 1.8; }
+
+/* ── PORTFOLIO ── */
+#portfolio { background: var(--bg); }
+
+.portfolio-header {
+display: flex;
+justify-content: space-between;
+align-items: flex-end;
+margin-bottom: 64px;
+}
+
+.portfolio-grid {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 24px;
+}
+
+.portfolio-item {
+position: relative;
+overflow: hidden;
+background: var(--border);
+cursor: pointer;
+}
+
+.portfolio-item:first-child {
+grid-column: span 2;
+}
+
+.portfolio-img {
+width: 100%;
+aspect-ratio: 16/9;
+object-fit: cover;
+display: block;
+background: var(--border);
+position: relative;
+}
+
+.portfolio-item:first-child .portfolio-img {
+aspect-ratio: 21/9;
+}
+
+/* Placeholder visuals */
+.portfolio-placeholder {
+width: 100%;
+aspect-ratio: 16/9;
+display: flex;
+align-items: center;
+justify-content: center;
+position: relative;
+overflow: hidden;
+transition: transform 0.5s ease;
+}
+
+.portfolio-item:first-child .portfolio-placeholder {
+aspect-ratio: 21/9;
+}
+
+.portfolio-item:hover .portfolio-placeholder { transform: scale(1.03); }
+
+.ph-1 { background: linear-gradient(135deg, #1a1916 0%, #3a3730 100%); }
+.ph-2 { background: linear-gradient(135deg, #c8a96e22 0%, #c8a96e55 100%); background-color: #e8e4de; }
+.ph-3 { background: linear-gradient(135deg, #2c2c2c 0%, #4a4a4a 100%); }
+.ph-4 { background: linear-gradient(135deg, #f0ece4 0%, #dedad4 100%); }
+
+.ph-inner {
+text-align: center;
+}
+
+.ph-title {
+font-family: 'Cormorant Garamond', serif;
+font-size: clamp(28px, 5vw, 64px);
+font-weight: 300;
+letter-spacing: 0.08em;
+}
+
+.ph-1 .ph-title, .ph-3 .ph-title { color: rgba(255,255,255,0.15); }
+.ph-2 .ph-title, .ph-4 .ph-title { color: rgba(26,25,22,0.12); }
+
+.portfolio-overlay {
+position: absolute;
+inset: 0;
+background: var(--ink);
+opacity: 0;
+display: flex;
+flex-direction: column;
+justify-content: flex-end;
+padding: 32px;
+transition: opacity 0.3s;
+}
+
+.portfolio-item:hover .portfolio-overlay { opacity: 0.92; }
+
+.portfolio-overlay h4 {
+font-family: 'Cormorant Garamond', serif;
+font-size: 26px;
+font-weight: 300;
+color: var(--white);
+margin-bottom: 6px;
+}
+
+.portfolio-overlay span {
+font-size: 11px;
+letter-spacing: 0.1em;
+text-transform: uppercase;
+color: var(--accent);
+}
+
+/* ── CONTACT ── */
+#contact {
+background: var(--ink);
+color: var(--bg);
+}
+
+#contact .section-label { color: var(--accent); }
+#contact .section-label::before { background: var(--accent); }
+
+#contact h2 { color: var(--bg); }
+
+.contact-layout {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 100px;
+align-items: start;
+margin-top: 64px;
+}
+
+.contact-info p {
+color: #8a8780;
+margin-bottom: 40px;
+line-height: 1.9;
+}
+
+.contact-detail {
+display: flex;
+flex-direction: column;
+gap: 20px;
+}
+
+.contact-detail a {
+color: var(--bg);
+text-decoration: none;
+font-size: 12px;
+letter-spacing: 0.06em;
+transition: color 0.2s;
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.contact-detail a::before {
+content: '→';
+color: var(--accent);
+}
+
+.contact-detail a:hover { color: var(--accent); }
+
+.contact-form {
+display: flex;
+flex-direction: column;
+gap: 20px;
+}
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.form-field {
+display: flex;
+flex-direction: column;
+gap: 8px;
+}
+
+.form-field label {
+font-size: 10px;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+color: #8a8780;
+}
+
+.form-field input,
+.form-field textarea {
+background: rgba(255,255,255,0.05);
+border: 1px solid rgba(255,255,255,0.1);
+color: var(--bg);
+padding: 14px 16px;
+font-family: 'DM Mono', monospace;
+font-size: 12px;
+font-weight: 300;
+outline: none;
+transition: border-color 0.2s;
+resize: none;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+border-color: var(--accent);
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+color: rgba(255,255,255,0.2);
+}
+
+.form-field textarea { height: 120px; }
+
+.btn-submit {
+align-self: flex-start;
+margin-top: 8px;
+background: var(--accent);
+color: var(--white);
+border: none;
+cursor: pointer;
+font-family: 'DM Mono', monospace;
+}
+
+.btn-submit:hover { background: var(--white); color: var(--ink); }
+
+/* ── FOOTER ── */
+footer {
+padding: 32px 48px;
+background: #111008;
+border-top: 1px solid rgba(255,255,255,0.06);
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+footer .logo { color: rgba(255,255,255,0.4); font-size: 18px; }
+footer .logo span { color: var(--accent); }
+
+footer p {
+font-size: 11px;
+color: rgba(255,255,255,0.25);
+letter-spacing: 0.06em;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeDown {
+from { opacity: 0; transform: translateY(-12px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+from { opacity: 0; }
+to { opacity: 1; }
+}
+
+.reveal {
+opacity: 0;
+transform: translateY(24px);
+transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.visible {
+opacity: 1;
+transform: none;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+nav { padding: 20px 24px; }
+nav ul { gap: 24px; }
+section { padding: 80px 24px; }
+.hero { padding: 0 24px 60px; }
+.services-header { grid-template-columns: 1fr; gap: 24px; }
+.services-grid { grid-template-columns: 1fr; }
+.portfolio-grid { grid-template-columns: 1fr; }
+.portfolio-item:first-child { grid-column: span 1; }
+.portfolio-item:first-child .portfolio-placeholder { aspect-ratio: 16/9; }
+.contact-layout { grid-template-columns: 1fr; gap: 48px; }
+.form-row { grid-template-columns: 1fr; }
+footer { flex-direction: column; gap: 12px; text-align: center; }
+}
+```
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+
+<nav>
+<a href="#" class="logo">JT <span>Creations</span></a>
+<ul>
+<li><a href="#services">Services</a></li>
+<li><a href="portfolio.html">Work</a></li>
+<li><a href="#contact">Contact</a></li>
+</ul>
+</nav>
+
+<!-- HERO -->
+
+<section class="hero">
+<div class="hero-bg-text">Design</div>
+<div class="hero-content">
+<div class="hero-tag">Web Design & Development</div>
+<h1>Websites built<br>to <em>make an impression.</em></h1>
+<p class="hero-sub">JT Creations crafts clean, purposeful websites for businesses, creators, and brands who want to stand out — without the noise.</p>
+<div class="hero-btns">
+<a href="#portfolio" class="btn">View Work</a>
+<a href="#contact" class="btn btn-ghost">Start a Project</a>
+</div>
+</div>
+</section>
+
+<!-- SERVICES -->
+
+<section id="services">
+<div class="services-header reveal">
+<div>
+<div class="section-label">What I do</div>
+<h2>Services built<br>around your goals</h2>
+</div>
+<p class="services-intro">Every project starts with understanding what you actually need — then building something that delivers it without unnecessary complexity.</p>
+</div>
+<div class="services-grid reveal">
+<div class="service-card">
+<div class="service-num">01</div>
+<h3>Web Design</h3>
+<p>Custom layouts and visual systems that reflect your brand. Every detail intentional, nothing generic.</p>
+</div>
+<div class="service-card">
+<div class="service-num">02</div>
+<h3>Web Development</h3>
+<p>Clean, fast, mobile-ready builds. From simple landing pages to full multi-page sites that actually perform.</p>
+</div>
+<div class="service-card">
+<div class="service-num">03</div>
+<h3>Brand Identity</h3>
+<p>Logos, color systems, and typography that give your business a visual identity worth remembering.</p>
+</div>
+</div>
+</section>
+
+<!-- PORTFOLIO -->
+
+<section id="portfolio">
+<div class="portfolio-header reveal">
+<div>
+<div class="section-label">Selected Work</div>
+<h2>Projects</h2>
+</div>
+<a href="#contact" class="btn btn-ghost">Start yours →</a>
+</div>
+<div class="portfolio-grid reveal">
+<a href="portfolio.html" class="portfolio-item" style="text-decoration:none;color:inherit;">
+<div class="ph-inner"><div class="ph-title">STUDIO</div></div>
+</div>
+<div class="portfolio-overlay">
+<h4>Studio Rebrand</h4>
+<span>Web Design · Identity</span>
+</div>
+</div>
+<a href="index.html#contact" class="portfolio-item" style="text-decoration:none;color:inherit;">
+<div class="portfolio-placeholder ph-2">
+<div class="ph-inner"><div class="ph-title">SHOP</div></div>
+</div>
+<div class="portfolio-overlay">
+<h4>E-Commerce Site</h4>
+<span>Web Development</span>
+</a>
+</div>
+<a href="brand.html" class="portfolio-item" style="text-decoration:none;color:inherit;">
+<div class="portfolio-placeholder ph-3">
+<div class="ph-inner"><div class="ph-title">BRAND</div></div>
+</div>
+<div class="portfolio-overlay">
+<h4>Brand Launch</h4>
+<span>Identity · Landing Page</span>
+</div>
+</a>
+</div>
+</section>
+
+<!-- CONTACT -->
+
+<section id="contact">
+<div class="section-label reveal">Let's talk</div>
+<h2 class="reveal">Ready to build<br>something?</h2>
+<div class="contact-layout">
+<div class="contact-info reveal">
+<p>Got a project in mind? Fill out the form or reach out directly. I'll get back to you within 24 hours.</p>
+<div class="contact-detail">
+<a href="mailto:dyshonjo@gmail.com">dyshonjo@gmail.com</a>
+<a href="#">Las Vegas, NV — Available Remotely</a>
+<a href="#">Instagram · LinkedIn</a>
+</div>
+</div>
+<form class="contact-form reveal" action="https://formspree.io/f/mlgpzogg" method="POST">
+<div class="form-row">
+<div class="form-field">
+<label>Name</label>
+<input type="text" name"name" placeholder="Your name" />
+</form>
+<div class="form-field">
+<label>Email</label>
+<input type="email" name="email" placeholder="your@email.com" />
+</div>
+</div>
+<div class="form-field">
+<label>Project Type</label>
+<input type="text" name="project" placeholder="e.g. New website, redesign, landing page..." />
+</div>
+<div class="form-field">
+<label>Message</label>
+<textarea name="message" placeholder="Tell me about your project..."></textarea>
+</div>
+<button type="submit" class="btn-submit">Send Message →</button>
+</div>
+</div>
+</section>
+
+<!-- FOOTER -->
+
+<footer>
+<a href="#" class="logo">JT <span>Creations</span></a>
+<p>© 2026 JT Creations · Las Vegas, NV</p>
+</footer>
+
+<script>
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+entries.forEach((e, i) => {
+if (e.isIntersecting) {
+setTimeout(() => e.target.classList.add('visible'), i * 80);
+observer.unobserve(e.target);
+}
+});
+}, { threshold: 0.1 });
+reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
