@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Care Plans · JT Creations</title>
+<meta name="description" content="Ongoing maintenance, support, and care plans for websites built by JT Creations. Three tiers structured around how you actually use your site." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f5f3ef;
+  --ink:#1a1916;
+  --muted:#8a8780;
+  --accent:#c8a96e;
+  --border:#dedad4;
+  --footer:#111008;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'DM Mono',monospace;
+  font-weight:300;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,.logo,.price{font-family:'Cormorant Garamond',serif;font-weight:300;}
+em{font-style:italic;color:var(--muted);}
+
+/* ---------- NAV ---------- */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:22px 6vw;
+  background:rgba(245,243,239,.82);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  animation:fadeDown .8s ease both;
+}
+.logo{font-size:1.5rem;letter-spacing:.02em;text-decoration:none;color:var(--ink);}
+.logo span{color:var(--accent);}
+nav ul{list-style:none;display:flex;gap:32px;align-items:center;}
+nav ul a{
+  text-decoration:none;color:var(--ink);font-size:.8rem;
+  text-transform:uppercase;letter-spacing:.12em;
+  opacity:.7;transition:opacity .25s;
+}
+nav ul a:hover{opacity:1;}
+nav ul a.active{opacity:1;color:var(--accent);}
+
+/* ---------- HERO ---------- */
+.hero{
+  position:relative;min-height:92vh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:0 6vw;overflow:hidden;isolation:isolate;
+}
+.hero .bg-text{
+  position:absolute;top:18%;left:6vw;
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  font-size:clamp(54px,10vw,150px);
+  line-height:.9;white-space:nowrap;
+  color:transparent;-webkit-text-stroke:1px #e6e2db;
+  text-stroke:1px #e6e2db;
+  opacity:.7;
+  z-index:-1;user-select:none;pointer-events:none;
+}
+.hero-inner{max-width:780px;animation:fadeUp 1s ease both;}
+.section-label{
+  display:inline-block;font-size:.72rem;text-transform:uppercase;
+  letter-spacing:.2em;color:var(--muted);margin-bottom:26px;
+  padding-left:38px;position:relative;
+}
+.section-label::before{
+  content:"";position:absolute;left:0;top:50%;
+  width:28px;height:1px;background:var(--accent);
+}
+.hero h1{font-size:clamp(2.6rem,6.5vw,5rem);line-height:1.04;margin-bottom:28px;}
+.hero p{max-width:520px;color:var(--muted);font-size:.95rem;}
+
+/* ---------- SECTIONS ---------- */
+section{padding:110px 6vw;}
+.light{background:#ffffff;}
+.cream{background:var(--bg);}
+
+.how{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:start;}
+.how h2{font-size:clamp(2rem,4vw,3.2rem);line-height:1.1;}
+.how-points{display:flex;flex-direction:column;gap:28px;}
+.how-points .pt{border-top:1px solid var(--border);padding-top:18px;}
+.how-points h4{font-size:1.4rem;margin-bottom:6px;}
+.how-points p{font-size:.88rem;color:var(--muted);}
+
+/* ---------- TIERS ---------- */
+.tiers-head{text-align:center;max-width:620px;margin:0 auto 64px;}
+.tiers-head .section-label{padding-left:0;}
+.tiers-head .section-label::before{display:none;}
+.tiers-head h2{font-size:clamp(2rem,4.5vw,3.4rem);line-height:1.1;}
+.tier-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:24px;
+  max-width:1100px;margin:0 auto;align-items:stretch;
+}
+.tier{
+  background:#fff;border:1px solid var(--border);
+  padding:40px 32px;display:flex;flex-direction:column;
+  transition:transform .3s ease,box-shadow .3s ease;
+}
+.tier:hover{transform:translateY(-6px);box-shadow:0 24px 50px rgba(26,25,22,.08);}
+.tier .num{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--accent);letter-spacing:.1em;}
+.tier h3{font-size:2rem;margin:8px 0 4px;}
+.tier .blurb{font-size:.8rem;color:var(--muted);min-height:36px;}
+.tier .price{font-size:3.4rem;line-height:1;margin:24px 0 4px;}
+.tier .price span{font-family:'DM Mono',monospace;font-size:.85rem;color:var(--muted);font-weight:300;}
+.tier ul{list-style:none;margin:28px 0;flex:1;}
+.tier ul li{
+  font-size:.84rem;padding:11px 0;border-bottom:1px solid var(--border);
+  position:relative;padding-left:22px;
+}
+.tier ul li::before{content:"—";position:absolute;left:0;color:var(--accent);}
+.tier .btn{margin-top:auto;}
+
+/* featured */
+.tier.featured{
+  background:var(--ink);color:var(--bg);border-color:var(--ink);
+  position:relative;
+}
+.tier.featured .blurb,.tier.featured .price span{color:#a8a59c;}
+.tier.featured ul li{border-color:rgba(255,255,255,.12);}
+.tier.featured .badge{
+  position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+  background:var(--accent);color:var(--ink);
+  font-size:.62rem;text-transform:uppercase;letter-spacing:.18em;
+  padding:6px 16px;white-space:nowrap;
+}
+.tier.featured .btn{background:var(--accent);color:var(--ink);border-color:var(--accent);}
+
+.btn{
+  display:inline-block;text-decoration:none;text-align:center;
+  font-size:.74rem;text-transform:uppercase;letter-spacing:.16em;
+  padding:15px 26px;border:1px solid var(--ink);color:var(--ink);
+  transition:background .25s,color .25s;
+}
+.btn:hover{background:var(--ink);color:var(--bg);}
+.tier.featured .btn:hover{background:transparent;color:var(--accent);}
+
+/* ---------- NEVER INCLUDED ---------- */
+.never{
+  max-width:1100px;margin:56px auto 0;
+  background:#faf6ee;border:1px solid var(--accent);
+  padding:30px 36px;
+}
+.never h4{font-family:'DM Mono',monospace;font-size:.78rem;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);margin-bottom:10px;}
+.never p{font-size:.86rem;color:var(--ink);}
+
+/* ---------- FINE PRINT ---------- */
+.fine{max-width:820px;margin:0 auto;}
+.fine .detail-item{display:flex;gap:26px;padding:26px 0;border-top:1px solid var(--border);}
+.fine .detail-num{font-family:'Cormorant Garamond',serif;font-size:2.2rem;color:var(--accent);line-height:1;min-width:50px;}
+.fine .detail-content h4{font-size:1.3rem;margin-bottom:4px;}
+.fine .detail-content p{font-size:.86rem;color:var(--muted);}
+
+/* ---------- CTA ---------- */
+.cta{background:var(--ink);color:var(--bg);text-align:center;}
+.cta .section-label{padding-left:0;color:var(--accent);}
+.cta .section-label::before{display:none;}
+.cta h2{font-size:clamp(2rem,4.5vw,3.4rem);line-height:1.12;max-width:760px;margin:0 auto 24px;}
+.cta h2 em{color:var(--accent);}
+.cta-sub{max-width:520px;margin:0 auto 38px;color:#a8a59c;font-size:.9rem;}
+.cta .btn{border-color:var(--accent);color:var(--accent);}
+.cta .btn:hover{background:var(--accent);color:var(--ink);}
+
+/* ---------- FOOTER ---------- */
+footer{background:var(--footer);color:#8a8780;text-align:center;padding:54px 6vw;}
+footer .logo{display:inline-block;margin-bottom:10px;color:#f5f3ef;}
+footer p{font-size:.76rem;letter-spacing:.06em;}
+
+/* ---------- ANIMATIONS ---------- */
+@keyframes fadeDown{from{opacity:0;transform:translateY(-16px);}to{opacity:1;transform:none;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:880px){
+  nav ul{gap:18px;}
+  .how{grid-template-columns:1fr;gap:36px;}
+  .tier-grid{grid-template-columns:1fr;max-width:420px;}
+  .tier.featured{order:-1;}
+}
+@media(max-width:560px){
+  nav{padding:18px 6vw;}
+  nav ul a:not(.active){display:none;}
+  section{padding:80px 7vw;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">JT Creations<span>.</span></a>
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="/portfolio.html">Work</a></li>
+    <li><a href="/care-plans.html" class="active">Care Plans</a></li>
+    <li><a href="/#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<header class="hero">
+  <div class="bg-text">care plans</div>
+  <div class="hero-inner">
+    <span class="section-label">Ongoing care</span>
+    <h1>Care plans for sites <em>that need to keep working</em></h1>
+    <p>A flat monthly fee, a predictable response, and no surprise invoice every time something needs a touch. Three tiers built around how you actually use your site.</p>
+  </div>
+</header>
+
+<section class="light">
+  <div class="how">
+    <div>
+      <span class="section-label">How it works</span>
+      <h2>One fee. <em>No mystery math.</em></h2>
+    </div>
+    <div class="how-points">
+      <div class="pt">
+        <h4>A set number of hours</h4>
+        <p>Each plan covers a monthly hour budget for fixes, tweaks, updates, and the small things that come up. Use them however you need.</p>
+      </div>
+      <div class="pt">
+        <h4>Predictable response</h4>
+        <p>Higher tiers get faster turnaround. You're not waiting in line behind a queue you can't see.</p>
+      </div>
+      <div class="pt">
+        <h4>No surprise invoices</h4>
+        <p>You know the number before the month starts. If you go over, the overage rate is set in advance — never a guess.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cream">
+  <div class="tiers-head">
+    <span class="section-label">The plans</span>
+    <h2>Pick the one that fits how <em>you run things</em></h2>
+  </div>
+
+  <div class="tier-grid">
+    <div class="tier">
+      <span class="num">01</span>
+      <h3>Care</h3>
+      <p class="blurb">For sites that mostly just need to stay healthy.</p>
+      <div class="price">$450<span>/mo</span></div>
+      <ul>
+        <li>5 hours of work each month</li>
+        <li>Plugin &amp; core updates</li>
+        <li>Uptime &amp; security monitoring</li>
+        <li>Standard response time</li>
+        <li>$80/hr overage rate</li>
+      </ul>
+      <a href="/#contact" class="btn">Start here</a>
+    </div>
+
+    <div class="tier featured">
+      <span class="badge">Most popular</span>
+      <span class="num">02</span>
+      <h3>Active Support</h3>
+      <p class="blurb">For an active store with real money flowing through it.</p>
+      <div class="price">$600<span>/mo</span></div>
+      <ul>
+        <li>10 hours of work each month</li>
+        <li>Everything in Care</li>
+        <li>Priority response time</li>
+        <li>Ongoing edits &amp; small features</li>
+        <li>$75/hr overage rate</li>
+      </ul>
+      <a href="/#contact" class="btn">Start here</a>
+    </div>
+
+    <div class="tier">
+      <span class="num">03</span>
+      <h3>Partnership</h3>
+      <p class="blurb">For when your site is the business, not a brochure.</p>
+      <div class="price">$750<span>/mo</span></div>
+      <ul>
+        <li>15 hours of work each month</li>
+        <li>Everything in Active Support</li>
+        <li>Fastest response time</li>
+        <li>Direct line for urgent issues</li>
+        <li>$70/hr overage rate</li>
+      </ul>
+      <a href="/#contact" class="btn">Start here</a>
+    </div>
+  </div>
+
+  <div class="never">
+    <h4>What's never included</h4>
+    <p>Brand-new features, full plugin builds, major design overhauls, and migrations are quoted separately. Care plans cover the upkeep — not ground-up new construction.</p>
+  </div>
+</section>
+
+<section class="light">
+  <div class="tiers-head">
+    <span class="section-label">The fine print</span>
+    <h2>Straight terms, <em>no fog</em></h2>
+  </div>
+  <div class="fine">
+    <div class="detail-item">
+      <span class="detail-num">01</span>
+      <div class="detail-content">
+        <h4>3-month minimum, then month-to-month</h4>
+        <p>Long enough to actually settle in, short enough that you're never locked into a year.</p>
+      </div>
+    </div>
+    <div class="detail-item">
+      <span class="detail-num">02</span>
+      <div class="detail-content">
+        <h4>Hours don't roll over</h4>
+        <p>Each month's budget is its own. Use it or lose it — no hoarding, no surprise 30-hour dumps.</p>
+      </div>
+    </div>
+    <div class="detail-item">
+      <span class="detail-num">03</span>
+      <div class="detail-content">
+        <h4>Billed in 15-minute increments</h4>
+        <p>Rounded up to the nearest quarter hour. A five-minute fix is a five-minute fix.</p>
+      </div>
+    </div>
+    <div class="detail-item">
+      <span class="detail-num">04</span>
+      <div class="detail-content">
+        <h4>Move tiers when it makes sense</h4>
+        <p>Upgrade anytime. Downgrading happens at the end of a billing cycle.</p>
+      </div>
+    </div>
+    <div class="detail-item">
+      <span class="detail-num">05</span>
+      <div class="detail-content">
+        <h4>Net 7 on invoices</h4>
+        <p>Billed at the start of each month for the month ahead. Card or bank transfer accepted.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <span class="section-label">Let's talk</span>
+  <h2>Ready for a site that <em>doesn't break the bank</em> every time it breaks?</h2>
+  <p class="cta-sub">Reach out and let's figure out which tier makes sense for your business. No pressure, no hard sell — just a straight conversation about what you actually need.</p>
+  <a href="/#contact" class="btn">Start the conversation →</a>
+</section>
+
+<footer>
+  <a href="/" class="logo">JT Creations<span>.</span></a>
+  <p>© 2026 JT Creations · Las Vegas, NV</p>
+</footer>
+
+</body>
+</html>
