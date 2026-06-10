@@ -468,7 +468,73 @@ footer p {
   letter-spacing: 0.06em;
 }
 
-/* ── ANIMATIONS ── */
+/* ── TESTIMONIALS ── */
+#testimonials {
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 64px;
+}
+
+.testimonial-card {
+  padding: 40px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  transition: border-color 0.2s;
+}
+
+.testimonial-card:hover { border-color: var(--accent); }
+
+.testimonial-quote {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.65;
+  color: var(--ink);
+  flex: 1;
+}
+
+.testimonial-quote::before {
+  content: '"';
+  color: var(--accent);
+  font-size: 48px;
+  line-height: 0;
+  vertical-align: -18px;
+  margin-right: 4px;
+}
+
+.testimonial-attr {
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+
+.testimonial-name {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.testimonial-role {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 900px) {
+  .testimonials-grid { grid-template-columns: 1fr; }
+}
+
+
 @keyframes fadeDown {
   from { opacity: 0; transform: translateY(-12px); }
   to { opacity: 1; transform: translateY(0); }
@@ -575,36 +641,67 @@ footer p {
       <div class="section-label">Selected Work</div>
       <h2>Projects</h2>
     </div>
-    <a href="#contact" class="btn btn-ghost">Start yours →</a>
+    <a href="portfolio.html" class="btn btn-ghost">View all work →</a>
   </div>
   <div class="portfolio-grid reveal">
-    <a href="portfolio.html" class="portfolio-item" style="text-decoration:none;color:inherit;">
+    <a href="https://dtklv.com" target="_blank" rel="noopener" class="portfolio-item" style="text-decoration:none;color:inherit;">
       <div class="portfolio-placeholder ph-1">
-        <div class="ph-inner"><div class="ph-title">STUDIO</div></div>
+        <div class="ph-inner"><div class="ph-title">DTK</div></div>
       </div>
       <div class="portfolio-overlay">
-        <h4>Studio Rebrand</h4>
-        <span>Web Design · Identity</span>
+        <h4>Desert Tails Kitchen</h4>
+        <span>E-Commerce · WordPress · WooCommerce</span>
       </div>
     </a>
-    <a href="index.html#contact" class="portfolio-item" style="text-decoration:none;color:inherit;">
+    <a href="https://rwturk.com" target="_blank" rel="noopener" class="portfolio-item" style="text-decoration:none;color:inherit;">
       <div class="portfolio-placeholder ph-2">
-        <div class="ph-inner"><div class="ph-title">SHOP</div></div>
+        <div class="ph-inner"><div class="ph-title">RW TURK</div></div>
       </div>
       <div class="portfolio-overlay">
-        <h4>E-Commerce Site</h4>
-        <span>Web Development</span>
+        <h4>RW Turk Construction</h4>
+        <span>Web Design · Development</span>
       </div>
     </a>
-    <a href="brand.html" class="portfolio-item" style="text-decoration:none;color:inherit;">
+    <a href="https://twentytwona.org" target="_blank" rel="noopener" class="portfolio-item" style="text-decoration:none;color:inherit;">
       <div class="portfolio-placeholder ph-3">
-        <div class="ph-inner"><div class="ph-title">BRAND</div></div>
+        <div class="ph-inner"><div class="ph-title">22</div></div>
       </div>
       <div class="portfolio-overlay">
-        <h4>Brand Launch</h4>
-        <span>Identity · Landing Page</span>
+        <h4>Twenty-Two: Never Walk Alone</h4>
+        <span>Nonprofit · Web Design · Development</span>
       </div>
     </a>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="reveal">
+    <div class="section-label">What clients say</div>
+    <h2>Real results,<br><em>real words.</em></h2>
+  </div>
+  <div class="testimonials-grid reveal">
+    <div class="testimonial-card">
+      <p class="testimonial-quote">You're my go-to guy from now on. Thank you for all your hard work, I do truly appreciate you.</p>
+      <div class="testimonial-attr">
+        <div class="testimonial-name">Paul Rocco</div>
+        <div class="testimonial-role">Owner, Desert Tails Kitchen</div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <p class="testimonial-quote">Joshua had our website up and running in a day. He worked professionally and had our site just how we wanted it. So reasonable and we couldn't be happier.</p>
+      <div class="testimonial-attr">
+        <div class="testimonial-name">RW Turk Construction</div>
+        <div class="testimonial-role">Las Vegas, NV</div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <p class="testimonial-quote">This looks amazing, seriously.</p>
+      <div class="testimonial-attr">
+        <div class="testimonial-name">Ashley Tellmer</div>
+        <div class="testimonial-role">Founder, Twenty-Two: Never Walk Alone</div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -616,7 +713,7 @@ footer p {
     <div class="contact-info reveal">
       <p>Got a project in mind? Fill out the form or reach out directly. I'll get back to you within 24 hours.</p>
       <div class="contact-detail">
-        <a href="mailto:dyshonjo@gmail.com">dyshonjo@gmail.com</a>
+        <a href="mailto:josh@jtcreations.org">josh@jtcreations.org</a>
         <a href="#">Las Vegas, NV — Available Remotely</a>
         <a href="#">Instagram · LinkedIn</a>
       </div>
