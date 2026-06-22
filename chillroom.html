@@ -639,7 +639,13 @@ const arcade = (function () {
   const W = 400, H = 300;
   let active = false, view = "menu", sel = 0, attractT = 0, blink = 0;
   let game = null;
-
+const SEAT = {
+    pos:  new THREE.Vector3(-4.75, 2.90, -0.40), // y = HEIGHT, x = how far back, z = side
+    look: new THREE.Vector3(-5.73, 2.95, -0.40), // screen center it locks onto
+    ease: 0.12
+  };
+  const seatProg = new THREE.Vector3();
+  function seatCamera() { seatProg.lerp(SEAT.pos, SEAT.ease); camera.position.copy(seatProg); camera.lookAt(SEAT.look); }
   function clear(c) { axx.fillStyle = c || "#070912"; axx.fillRect(0, 0, W, H); }
   function text(s, x, y, size, col, align) {
     axx.fillStyle = col || "#7cffd0";
@@ -989,8 +995,12 @@ const arcade = (function () {
     center("Snake \u00b7 Breakout \u00b7 Pong \u00b7 2048 \u00b7 Asteroids \u00b7 Mines", H - 16, 11, "rgba(200,220,255,0.5)");
   }
 
-  function engage() { active = true; view = "menu"; sel = 0; status("ARCADE \u00b7 \u2191/\u2193 pick \u00b7 Enter play \u00b7 Esc stand up"); }
-  function stand() { active = false; }
+  function engage() { active = true; view = "menu"; sel = 0; seatProg.copy(camera.position); status("ARCADE \u00b7 \u2191/\u2193 pick \u00b7 Enter play \u00b7 Esc stand up"); }
+  function stand() {
+    active = false;
+    player.x = SEAT.pos.x; player.z = SEAT.pos.z;
+    cam.yaw = -Math.PI / 2; cam.pitch = 0;
+  }
   function click() { if (active) stand(); else engage(); }
   function onKey(k) {
     if (view === "menu") {
@@ -1007,6 +1017,7 @@ const arcade = (function () {
   function tick(dt) {
     arcadeTex.needsUpdate = true; blink += dt;
     if (arcadeGlow) arcadeGlow.intensity = active ? 1.1 : (0.45 + 0.25 * Math.sin(blink * 3));
+    if (active) seatCamera();
     if (!active) { drawAttract(dt); return; }
     if (view === "menu") { drawMenu(); return; }
     if (game) { if (!game.over) game.step(dt); game.draw(); if (game.over) drawOver(); }
