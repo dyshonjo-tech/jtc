@@ -545,7 +545,7 @@
       if(!m.userData.url){ status("add "+m.userData.name+"’s link in the CONFIG at the top"); }
       else window.open(m.userData.url,"_blank","noopener");
     }
-    function hitList(){ return [TV,MONITOR,LAMP,PCHIT].concat(posterArts); }
+    function hitList(){ return [TV,MONITOR,LAMP,PCHIT,ARCADE_SCREEN].concat(posterArts); }   // ← added ARCADE_SCREEN
     function tryClick(cx,cy){
       ndc.x=(cx/window.innerWidth)*2-1; ndc.y=-(cy/window.innerHeight)*2+1;
       ray.setFromCamera(ndc,camera);
@@ -555,6 +555,7 @@
       else if(a==="lamp") setLamp(!lampOn);
       else if(a==="site") openSite();
       else if(a==="proj") openProject(hit.object);
+      else if(a==="arcade") arcade.click();
     }
 
     // load the live JT Creations site onto the monitor (in-world iframe); called once CSS3D is ready
@@ -570,7 +571,450 @@
       obj.position.set(4.4,2.6,-4.42);   // on the monitor face
       cssScene.add(obj);
     }
+/* ============================================================
+   JTC ARCADE  —  PASTE THIS ENTIRE BLOCK into your chill room.
+   Where: directly ABOVE the line   // ---------- controls ----------
+   It uses your existing helpers (place, prop, toonMat, scene,
+   status, keys) and reads/writes the scene the same way you do.
+   ============================================================ */
 
+let ARCADE_SCREEN = null, arcadeGlow = null;
+const acv = document.createElement("canvas"); acv.width = 400; acv.height = 300;
+const axx = acv.getContext("2d");
+const arcadeTex = new THREE.CanvasTexture(acv);
+arcadeTex.encoding = THREE.sRGBEncoding; arcadeTex.minFilter = THREE.LinearFilter;
+
+/* ---------- the cabinet, in the left-wall gap between the two posters ---------- */
+(function () {
+  const CX = -6.3, CZ = -0.4, FX = -5.8;            // body center / gap / front face (+x, toward room)
+  place(prop(new THREE.BoxGeometry(1.0, 4.2, 1.4), 0x15171f, 0.02), CX, 2.1, CZ);    // cabinet body
+  place(prop(new THREE.BoxGeometry(1.1, 0.45, 1.55), 0x0e0f15, 0.02), CX, 4.15, CZ); // top cap
+
+  // marquee (lit header)
+  const mc = document.createElement("canvas"); mc.width = 384; mc.height = 96;
+  const mg = mc.getContext("2d");
+  mg.fillStyle = "#0a0a12"; mg.fillRect(0, 0, 384, 96);
+  mg.textAlign = "center"; mg.shadowColor = "#7cd1ff"; mg.shadowBlur = 18;
+  mg.fillStyle = "#7cffd0"; mg.font = "700 40px ui-monospace, monospace"; mg.fillText("JTC ARCADE", 192, 50);
+  mg.shadowBlur = 0; mg.fillStyle = "#ff5a7a"; mg.font = "15px ui-monospace, monospace"; mg.fillText("\u00b7 insert coin \u00b7", 192, 78);
+  const mtex = new THREE.CanvasTexture(mc); mtex.encoding = THREE.sRGBEncoding;
+  const marquee = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 0.34), new THREE.MeshBasicMaterial({ map: mtex }));
+  marquee.position.set(FX + 0.02, 3.7, CZ); marquee.rotation.y = Math.PI / 2; scene.add(marquee);
+
+  // screen bezel + the live game screen (same facing as your left-wall posters)
+  place(prop(new THREE.BoxGeometry(0.12, 1.0, 1.18), 0x06070c, 0.02), FX, 2.95, CZ);
+  ARCADE_SCREEN = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 0.75), new THREE.MeshBasicMaterial({ map: arcadeTex }));
+  ARCADE_SCREEN.position.set(FX + 0.07, 2.95, CZ);
+  ARCADE_SCREEN.rotation.y = Math.PI / 2;
+  ARCADE_SCREEN.userData.act = "arcade";
+  scene.add(ARCADE_SCREEN);
+
+  // neon side strips on the front edges
+  [-0.72, 0.72].forEach(function (zz) {
+    const s = new THREE.Mesh(new THREE.BoxGeometry(0.05, 3.0, 0.06), new THREE.MeshBasicMaterial({ color: 0x7cd1ff }));
+    s.position.set(FX + 0.01, 2.3, CZ + zz); scene.add(s);
+  });
+
+  // slanted control panel jutting toward the room
+  const panel = prop(new THREE.BoxGeometry(0.7, 0.12, 1.2), 0x1b1e2a, 0.03);
+  panel.position.set(FX + 0.18, 1.95, CZ); panel.rotation.z = -0.42; scene.add(panel);
+  place(prop(new THREE.CylinderGeometry(0.035, 0.035, 0.22, 8), 0x222634, 0.05), FX + 0.14, 2.16, CZ - 0.34); // joystick shaft
+  const knob = new THREE.Mesh(new THREE.SphereGeometry(0.075, 12, 12), new THREE.MeshBasicMaterial({ color: 0xff3d57 }));
+  knob.position.set(FX + 0.17, 2.28, CZ - 0.34); scene.add(knob);
+  [[-0.06, 0xffe24e], [0.12, 0x7cffd0], [0.30, 0xff8a5a]].forEach(function (b) {
+    const btn = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.05, 14), new THREE.MeshBasicMaterial({ color: b[1] }));
+    btn.position.set(FX + 0.2, 2.12, CZ + b[0]); btn.rotation.z = Math.PI / 2; scene.add(btn);
+  });
+
+  // coin door strip
+  place(prop(new THREE.BoxGeometry(0.08, 0.45, 0.9), 0x0c0d14, 0.03), FX + 0.01, 1.2, CZ);
+
+  // glow that spills toward the room (brighter while you're playing)
+  arcadeGlow = new THREE.PointLight(0x7cd1ff, 0.6, 9, 2);
+  arcadeGlow.position.set(FX + 0.4, 2.95, CZ); scene.add(arcadeGlow);
+})();
+
+/* ---------- the games + the engine ---------- */
+const arcade = (function () {
+  const W = 400, H = 300;
+  let active = false, view = "menu", sel = 0, attractT = 0, blink = 0;
+  let game = null;
+
+  function clear(c) { axx.fillStyle = c || "#070912"; axx.fillRect(0, 0, W, H); }
+  function text(s, x, y, size, col, align) {
+    axx.fillStyle = col || "#7cffd0";
+    axx.font = "700 " + (size || 16) + "px ui-monospace, monospace";
+    axx.textAlign = align || "left"; axx.fillText(s, x, y); axx.textAlign = "left";
+  }
+  function center(s, y, size, col) { text(s, W / 2, y, size, col, "center"); }
+
+  /* ===== SNAKE ===== */
+  const Snake = (function () {
+    const cell = 15, cols = 24, rows = 16, ox = 20, oy = 36;
+    let snake, dir, ndir, food, acc, step, score;
+    function placeFood() {
+      while (true) {
+        const f = { x: (Math.random() * cols) | 0, y: (Math.random() * rows) | 0 };
+        if (!snake.some(function (s) { return s.x === f.x && s.y === f.y; })) { food = f; return; }
+      }
+    }
+    return {
+      name: "SNAKE", over: false,
+      reset() { snake = [{ x: 8, y: 8 }, { x: 7, y: 8 }, { x: 6, y: 8 }]; dir = { x: 1, y: 0 }; ndir = { x: 1, y: 0 }; acc = 0; step = 0.11; score = 0; this.over = false; placeFood(); },
+      key(k) {
+        if ((k === "arrowup" || k === "w") && dir.y === 0) ndir = { x: 0, y: -1 };
+        else if ((k === "arrowdown" || k === "s") && dir.y === 0) ndir = { x: 0, y: 1 };
+        else if ((k === "arrowleft" || k === "a") && dir.x === 0) ndir = { x: -1, y: 0 };
+        else if ((k === "arrowright" || k === "d") && dir.x === 0) ndir = { x: 1, y: 0 };
+      },
+      step(dt) {
+        acc += dt; if (acc < step) return; acc = 0; dir = ndir;
+        const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+        if (head.x < 0 || head.y < 0 || head.x >= cols || head.y >= rows ||
+          snake.some(function (s) { return s.x === head.x && s.y === head.y; })) { this.over = true; return; }
+        snake.unshift(head);
+        if (head.x === food.x && head.y === food.y) { score += 10; if (step > 0.05) step -= 0.004; placeFood(); }
+        else snake.pop();
+      },
+      draw() {
+        clear();
+        axx.strokeStyle = "#1d2a44"; axx.lineWidth = 2; axx.strokeRect(ox - 2, oy - 2, cols * cell + 4, rows * cell + 4);
+        axx.fillStyle = "#ff5a7a"; axx.fillRect(ox + food.x * cell + 2, oy + food.y * cell + 2, cell - 4, cell - 4);
+        for (let i = 0; i < snake.length; i++) { axx.fillStyle = i === 0 ? "#9bffd0" : "#39c98f"; axx.fillRect(ox + snake[i].x * cell + 1, oy + snake[i].y * cell + 1, cell - 2, cell - 2); }
+        text("SNAKE", 12, 24, 16, "#7cffd0"); text("SCORE " + score, W - 12, 24, 16, "#cfe6ff", "right");
+      }
+    };
+  })();
+
+  /* ===== BREAKOUT ===== */
+  const Breakout = (function () {
+    const PW = 64, PH = 10, BR = 5;
+    let px, ball, bricks, score, lives, won;
+    function build() {
+      bricks = []; const cols = 10, rows = 5, bw = 36, bh = 14, gx = 8, gy = 42, gap = 2;
+      const colrs = ["#ff5a7a", "#ffb14e", "#ffe24e", "#7cffd0", "#7cb0ff"];
+      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++)
+        bricks.push({ x: gx + c * (bw + gap), y: gy + r * (bh + gap), w: bw, h: bh, c: colrs[r], alive: true });
+    }
+    function launch() { ball = { x: 200, y: 240, vx: (Math.random() < 0.5 ? -1 : 1) * 150, vy: -180, r: BR }; }
+    return {
+      name: "BREAKOUT", over: false,
+      reset() { px = 168; score = 0; lives = 3; won = false; this.over = false; build(); launch(); },
+      key() { },
+      step(dt) {
+        const sp = 280;
+        if (keys["arrowleft"] || keys["a"]) px -= sp * dt;
+        if (keys["arrowright"] || keys["d"]) px += sp * dt;
+        px = Math.max(8, Math.min(W - 8 - PW, px));
+        ball.x += ball.vx * dt; ball.y += ball.vy * dt;
+        if (ball.x < 8 + ball.r) { ball.x = 8 + ball.r; ball.vx *= -1; }
+        if (ball.x > W - 8 - ball.r) { ball.x = W - 8 - ball.r; ball.vx *= -1; }
+        if (ball.y < 30 + ball.r) { ball.y = 30 + ball.r; ball.vy *= -1; }
+        const py = H - 24;
+        if (ball.vy > 0 && ball.y + ball.r >= py && ball.y + ball.r <= py + PH + 6 && ball.x >= px && ball.x <= px + PW) {
+          ball.vy = -Math.abs(ball.vy); ball.vx = ((ball.x - (px + PW / 2)) / (PW / 2)) * 220;
+        }
+        for (const b of bricks) {
+          if (!b.alive) continue;
+          if (ball.x > b.x && ball.x < b.x + b.w && ball.y - ball.r < b.y + b.h && ball.y + ball.r > b.y) {
+            b.alive = false; score += 10; ball.vy *= -1; break;
+          }
+        }
+        if (bricks.every(function (b) { return !b.alive; })) { won = true; this.over = true; }
+        if (ball.y > H + 10) { lives--; if (lives <= 0) this.over = true; else launch(); }
+      },
+      draw() {
+        clear();
+        text("BREAKOUT", 12, 22, 15, "#7cffd0"); text("SCORE " + score, W / 2, 22, 15, "#cfe6ff", "center"); text("\u2665 " + Math.max(0, lives), W - 12, 22, 15, "#ff8aa0", "right");
+        axx.fillStyle = "#9bffd0"; axx.fillRect(px, H - 24, PW, PH);
+        for (const b of bricks) if (b.alive) { axx.fillStyle = b.c; axx.fillRect(b.x, b.y, b.w, b.h); }
+        axx.fillStyle = "#fff"; axx.beginPath(); axx.arc(ball.x, ball.y, ball.r, 0, 7); axx.fill();
+        if (won) center("YOU CLEARED IT!", H / 2, 22, "#ffe24e");
+      }
+    };
+  })();
+
+  /* ===== PONG (vs CPU) ===== */
+  const Pong = (function () {
+    const PW = 8, PH = 46;
+    let l, r, ball, sl, sr;
+    function serve(d) { ball = { x: 200, y: 150, vx: d * 175, vy: (Math.random() * 120 - 60), r: 5 }; }
+    return {
+      name: "PONG", over: false,
+      reset() { l = 127; r = 127; sl = 0; sr = 0; this.over = false; serve(Math.random() < 0.5 ? -1 : 1); },
+      key() { },
+      step(dt) {
+        const sp = 250;
+        if (keys["arrowup"] || keys["w"]) l -= sp * dt;
+        if (keys["arrowdown"] || keys["s"]) l += sp * dt;
+        l = Math.max(30, Math.min(H - PH, l));
+        const target = ball.y - PH / 2, aisp = 175;
+        if (r + 3 < target) r += aisp * dt; else if (r - 3 > target) r -= aisp * dt;
+        r = Math.max(30, Math.min(H - PH, r));
+        ball.x += ball.vx * dt; ball.y += ball.vy * dt;
+        if (ball.y < 30 + ball.r) { ball.y = 30 + ball.r; ball.vy *= -1; }
+        if (ball.y > H - ball.r) { ball.y = H - ball.r; ball.vy *= -1; }
+        if (ball.vx < 0 && ball.x - ball.r < 18 + PW && ball.x > 18 && ball.y > l && ball.y < l + PH) {
+          ball.x = 18 + PW + ball.r; ball.vx = Math.abs(ball.vx) * 1.05; ball.vy += ((ball.y - (l + PH / 2)) / (PH / 2)) * 120;
+        }
+        if (ball.vx > 0 && ball.x + ball.r > W - 18 - PW && ball.x < W - 18 && ball.y > r && ball.y < r + PH) {
+          ball.x = W - 18 - PW - ball.r; ball.vx = -Math.abs(ball.vx) * 1.05; ball.vy += ((ball.y - (r + PH / 2)) / (PH / 2)) * 120;
+        }
+        if (ball.x < 0) { sr++; if (sr >= 7) this.over = true; else serve(1); }
+        if (ball.x > W) { sl++; if (sl >= 7) this.over = true; else serve(-1); }
+      },
+      draw() {
+        clear();
+        axx.strokeStyle = "#1d2a44"; axx.setLineDash([6, 8]); axx.beginPath(); axx.moveTo(W / 2, 30); axx.lineTo(W / 2, H); axx.stroke(); axx.setLineDash([]);
+        text("YOU " + sl, 70, 22, 16, "#7cffd0", "center"); text("CPU " + sr, W - 70, 22, 16, "#ff8aa0", "center");
+        axx.fillStyle = "#9bffd0"; axx.fillRect(18, l, PW, PH);
+        axx.fillStyle = "#ff8aa0"; axx.fillRect(W - 18 - PW, r, PW, PH);
+        axx.fillStyle = "#fff"; axx.beginPath(); axx.arc(ball.x, ball.y, ball.r, 0, 7); axx.fill();
+        if (this.over) center(sl > sr ? "YOU WIN!" : "CPU WINS", H / 2 - 10, 22, sl > sr ? "#ffe24e" : "#ff8aa0");
+      }
+    };
+  })();
+
+  /* ===== 2048 ===== */
+  const G2048 = (function () {
+    const N = 4, ox = 80, oy = 48, cs = 54, gap = 5;
+    let grid, score, won;
+    function emptyCells() { const e = []; for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (!grid[y][x]) e.push([x, y]); return e; }
+    function spawn() { const e = emptyCells(); if (!e.length) return; const p = e[(Math.random() * e.length) | 0]; grid[p[1]][p[0]] = Math.random() < 0.9 ? 2 : 4; }
+    function slide(row) {
+      let a = row.filter(function (v) { return v; }); let g = 0;
+      for (let i = 0; i < a.length - 1; i++) { if (a[i] === a[i + 1]) { a[i] *= 2; g += a[i]; if (a[i] === 2048) won = true; a.splice(i + 1, 1); } }
+      while (a.length < N) a.push(0);
+      return { row: a, g: g };
+    }
+    function moveLeft() { let moved = false; for (let y = 0; y < N; y++) { const o = slide(grid[y]); score += o.g; if (o.row.join() !== grid[y].join()) moved = true; grid[y] = o.row; } return moved; }
+    function rotate() { const n = []; for (let x = 0; x < N; x++) { n.push([]); for (let y = N - 1; y >= 0; y--) n[x].push(grid[y][x]); } grid = n; }
+    function move(dir) { for (let i = 0; i < dir; i++) rotate(); const moved = moveLeft(); for (let i = 0; i < (4 - dir) % 4; i++) rotate(); return moved; }
+    function anyMoves() {
+      if (emptyCells().length) return true;
+      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const v = grid[y][x]; if ((x < N - 1 && grid[y][x + 1] === v) || (y < N - 1 && grid[y + 1][x] === v)) return true; }
+      return false;
+    }
+    const COL = { 2: "#2b3a55", 4: "#33507a", 8: "#3f6fb0", 16: "#5a8fd6", 32: "#7cb0ff", 64: "#7cffd0", 128: "#ffe24e", 256: "#ffb14e", 512: "#ff8a5a", 1024: "#ff5a7a", 2048: "#ff3df0" };
+    return {
+      name: "2048", over: false,
+      reset() { grid = []; for (let y = 0; y < N; y++) { grid.push([]); for (let x = 0; x < N; x++) grid[y].push(0); } score = 0; won = false; this.over = false; spawn(); spawn(); },
+      key(k) {
+        let dir = -1;
+        if (k === "arrowleft" || k === "a") dir = 0;
+        else if (k === "arrowup" || k === "w") dir = 3;
+        else if (k === "arrowright" || k === "d") dir = 2;
+        else if (k === "arrowdown" || k === "s") dir = 1;
+        if (dir < 0) return;
+        if (move(dir)) { spawn(); if (!anyMoves()) this.over = true; }
+      },
+      step() { },
+      draw() {
+        clear();
+        text("2048", 12, 30, 18, "#7cffd0"); text("SCORE " + score, W - 12, 30, 16, "#cfe6ff", "right");
+        const sz = N * cs + (N + 1) * gap;
+        axx.fillStyle = "#10182a"; axx.fillRect(ox, oy, sz, sz);
+        for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+          const v = grid[y][x], cx = ox + gap + x * (cs + gap), cy = oy + gap + y * (cs + gap);
+          axx.fillStyle = v ? (COL[v] || "#ff3df0") : "#1a2740"; axx.fillRect(cx, cy, cs, cs);
+          if (v) {
+            axx.fillStyle = v <= 4 ? "#cfe0ff" : "#0a0f1c";
+            axx.font = "700 " + (v < 100 ? 26 : v < 1000 ? 22 : 18) + "px ui-monospace, monospace";
+            axx.textAlign = "center"; axx.textBaseline = "middle"; axx.fillText(v, cx + cs / 2, cy + cs / 2 + 1);
+            axx.textBaseline = "alphabetic"; axx.textAlign = "left";
+          }
+        }
+        if (won) center("2048! keep going", H - 8, 13, "#ffe24e");
+      }
+    };
+  })();
+
+  /* ===== ASTEROIDS ===== */
+  const Asteroids = (function () {
+    let ship, bullets, rocks, score, lives, cool, inv;
+    function newRock(x, y, size) {
+      const a = Math.random() * 7, sp = 30 + Math.random() * 40 + (3 - size) * 15;
+      return { x: x, y: y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, size: size, r: size * 9, seed: Math.random() * 6 };
+    }
+    function spawnWave(n) {
+      rocks = [];
+      for (let i = 0; i < n; i++) { let x, y; do { x = Math.random() * W; y = Math.random() * H; } while (Math.hypot(x - ship.x, y - ship.y) < 80); rocks.push(newRock(x, y, 3)); }
+    }
+    function wrap(o) { if (o.x < 0) o.x += W; if (o.x > W) o.x -= W; if (o.y < 0) o.y += H; if (o.y > H) o.y -= H; }
+    return {
+      name: "ASTEROIDS", over: false,
+      reset() { ship = { x: W / 2, y: H / 2, a: -Math.PI / 2, vx: 0, vy: 0 }; bullets = []; score = 0; lives = 3; cool = 0; inv = 2; this.over = false; spawnWave(4); },
+      key() { },
+      step(dt) {
+        inv -= dt; cool -= dt;
+        if (keys["arrowleft"] || keys["a"]) ship.a -= 3.2 * dt;
+        if (keys["arrowright"] || keys["d"]) ship.a += 3.2 * dt;
+        if (keys["arrowup"] || keys["w"]) { ship.vx += Math.cos(ship.a) * 180 * dt; ship.vy += Math.sin(ship.a) * 180 * dt; }
+        ship.vx *= 0.99; ship.vy *= 0.99;
+        const sp = Math.hypot(ship.vx, ship.vy), max = 240; if (sp > max) { ship.vx *= max / sp; ship.vy *= max / sp; }
+        ship.x += ship.vx * dt; ship.y += ship.vy * dt; wrap(ship);
+        if ((keys[" "] || keys["spacebar"]) && cool <= 0) {
+          bullets.push({ x: ship.x + Math.cos(ship.a) * 12, y: ship.y + Math.sin(ship.a) * 12, vx: Math.cos(ship.a) * 340 + ship.vx, vy: Math.sin(ship.a) * 340 + ship.vy, life: 1.0 });
+          cool = 0.22;
+        }
+        for (const b of bullets) { b.x += b.vx * dt; b.y += b.vy * dt; b.life -= dt; wrap(b); }
+        bullets = bullets.filter(function (b) { return b.life > 0; });
+        for (const r of rocks) { r.x += r.vx * dt; r.y += r.vy * dt; wrap(r); }
+        for (let i = rocks.length - 1; i >= 0; i--) {
+          const r = rocks[i];
+          for (let j = bullets.length - 1; j >= 0; j--) {
+            const b = bullets[j];
+            if (Math.hypot(b.x - r.x, b.y - r.y) < r.r) {
+              bullets.splice(j, 1); rocks.splice(i, 1); score += (4 - r.size) * 20;
+              if (r.size > 1) { rocks.push(newRock(r.x, r.y, r.size - 1)); rocks.push(newRock(r.x, r.y, r.size - 1)); }
+              break;
+            }
+          }
+        }
+        if (!rocks.length) spawnWave(4 + ((score / 400) | 0));
+        if (inv <= 0) {
+          for (const r of rocks) {
+            if (Math.hypot(ship.x - r.x, ship.y - r.y) < r.r + 7) {
+              lives--; inv = 2; ship.x = W / 2; ship.y = H / 2; ship.vx = ship.vy = 0;
+              if (lives <= 0) this.over = true; break;
+            }
+          }
+        }
+      },
+      draw() {
+        clear("#04060f");
+        text("ASTEROIDS", 12, 20, 14, "#7cffd0"); text("SCORE " + score, W / 2, 20, 14, "#cfe6ff", "center"); text("\u25b2 " + Math.max(0, lives), W - 12, 20, 14, "#9bffd0", "right");
+        axx.strokeStyle = "#b9c6e0"; axx.lineWidth = 2;
+        for (const r of rocks) {
+          axx.beginPath();
+          for (let k = 0; k <= 8; k++) { const ang = k / 8 * Math.PI * 2, rr = r.r * (0.8 + 0.2 * Math.sin(ang * 3 + r.seed)), px = r.x + Math.cos(ang) * rr, py = r.y + Math.sin(ang) * rr; if (k) axx.lineTo(px, py); else axx.moveTo(px, py); }
+          axx.stroke();
+        }
+        axx.fillStyle = "#ffe24e"; for (const b of bullets) axx.fillRect(b.x - 1.5, b.y - 1.5, 3, 3);
+        if (inv <= 0 || Math.sin(inv * 30) > 0) {
+          axx.save(); axx.translate(ship.x, ship.y); axx.rotate(ship.a); axx.strokeStyle = "#9bffd0"; axx.lineWidth = 2;
+          axx.beginPath(); axx.moveTo(12, 0); axx.lineTo(-8, -7); axx.lineTo(-4, 0); axx.lineTo(-8, 7); axx.closePath(); axx.stroke();
+          if (keys["arrowup"] || keys["w"]) { axx.strokeStyle = "#ff8a5a"; axx.beginPath(); axx.moveTo(-4, 0); axx.lineTo(-12, 0); axx.stroke(); }
+          axx.restore();
+        }
+        if (this.over) center("GAME OVER", H / 2, 22, "#ff5a7a");
+      }
+    };
+  })();
+
+  /* ===== MINESWEEPER ===== */
+  const Mines = (function () {
+    const N = 9, MINES = 10, cs = 26, ox = 86, oy = 48;
+    let grid, cur, dead, win, flags, revealedCount;
+    function build() {
+      grid = [];
+      for (let y = 0; y < N; y++) { grid.push([]); for (let x = 0; x < N; x++) grid[y].push({ m: false, r: false, f: false, n: 0 }); }
+      let placed = 0;
+      while (placed < MINES) { const x = (Math.random() * N) | 0, y = (Math.random() * N) | 0; if (!grid[y][x].m) { grid[y][x].m = true; placed++; } }
+      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+        if (grid[y][x].m) continue;
+        let n = 0;
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const nx = x + dx, ny = y + dy; if (nx >= 0 && nx < N && ny >= 0 && ny < N && grid[ny][nx].m) n++; }
+        grid[y][x].n = n;
+      }
+    }
+    function reveal(x, y) {
+      const c = grid[y][x]; if (c.r || c.f) return; c.r = true; revealedCount++;
+      if (c.m) { dead = true; return; }
+      if (c.n === 0) for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const nx = x + dx, ny = y + dy; if (nx >= 0 && nx < N && ny >= 0 && ny < N && !grid[ny][nx].r) reveal(nx, ny); }
+    }
+    const NCOL = ["", "#7cb0ff", "#7cffd0", "#ffe24e", "#ffb14e", "#ff8a5a", "#ff5a7a", "#ff3df0", "#ffffff"];
+    return {
+      name: "MINESWEEPER", over: false,
+      reset() { cur = { x: 4, y: 4 }; dead = false; win = false; flags = 0; revealedCount = 0; this.over = false; build(); },
+      key(k) {
+        if (k === "arrowup" || k === "w") cur.y = (cur.y + N - 1) % N;
+        else if (k === "arrowdown" || k === "s") cur.y = (cur.y + 1) % N;
+        else if (k === "arrowleft" || k === "a") cur.x = (cur.x + N - 1) % N;
+        else if (k === "arrowright" || k === "d") cur.x = (cur.x + 1) % N;
+        else if (k === "enter" || k === " " || k === "spacebar") { reveal(cur.x, cur.y); if (dead) this.over = true; }
+        else if (k === "f") { const c = grid[cur.y][cur.x]; if (!c.r) { c.f = !c.f; flags += c.f ? 1 : -1; } }
+        if (!dead && revealedCount === N * N - MINES) { win = true; this.over = true; }
+      },
+      step() { },
+      draw() {
+        clear();
+        text("MINESWEEPER", 12, 28, 15, "#7cffd0"); text("\u2691 " + (MINES - flags), W - 12, 28, 15, "#ffe24e", "right");
+        for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+          const c = grid[y][x], cx = ox + x * cs, cy = oy + y * cs;
+          if (c.r) {
+            axx.fillStyle = c.m ? "#ff3df0" : "#16223a"; axx.fillRect(cx, cy, cs - 2, cs - 2);
+            if (c.m) { axx.fillStyle = "#000"; axx.beginPath(); axx.arc(cx + (cs - 2) / 2, cy + (cs - 2) / 2, 5, 0, 7); axx.fill(); }
+            else if (c.n > 0) { axx.fillStyle = NCOL[c.n]; axx.font = "700 15px ui-monospace, monospace"; axx.textAlign = "center"; axx.textBaseline = "middle"; axx.fillText(c.n, cx + (cs - 2) / 2, cy + (cs - 2) / 2 + 1); axx.textBaseline = "alphabetic"; axx.textAlign = "left"; }
+          } else {
+            axx.fillStyle = "#2c3c5c"; axx.fillRect(cx, cy, cs - 2, cs - 2);
+            if (c.f) { axx.fillStyle = "#ff5a7a"; axx.font = "700 14px ui-monospace, monospace"; axx.textAlign = "center"; axx.textBaseline = "middle"; axx.fillText("\u2691", cx + (cs - 2) / 2, cy + (cs - 2) / 2 + 1); axx.textBaseline = "alphabetic"; axx.textAlign = "left"; }
+          }
+          if (cur.x === x && cur.y === y) { axx.strokeStyle = "#9bffd0"; axx.lineWidth = 2; axx.strokeRect(cx, cy, cs - 2, cs - 2); }
+        }
+        text("arrows move \u00b7 space reveal \u00b7 F flag", W / 2, H - 8, 11, "rgba(200,220,255,0.5)", "center");
+        if (win) center("SWEPT! you win", H / 2, 22, "#ffe24e");
+        else if (dead) center("BOOM", H / 2, 22, "#ff5a7a");
+      }
+    };
+  })();
+
+  const games = [Snake, Breakout, Pong, G2048, Asteroids, Mines];
+
+  function drawMenu() {
+    clear("#070912");
+    center("JTC ARCADE", 52, 30, "#7cffd0");
+    axx.fillStyle = "rgba(124,255,208,0.18)"; axx.fillRect(60, 66, W - 120, 2);
+    for (let i = 0; i < games.length; i++) {
+      const y = 100 + i * 30;
+      if (i === sel) { axx.fillStyle = "rgba(124,176,255,0.18)"; axx.fillRect(70, y - 18, W - 140, 26); }
+      text((i === sel ? "\u25b8 " : "  ") + games[i].name, 90, y, 18, i === sel ? "#fff" : "#9fb6d8");
+    }
+    center("Enter to play   \u00b7   Esc to stand up", H - 18, 12, "rgba(200,220,255,0.55)");
+  }
+  function drawOver() {
+    axx.fillStyle = "rgba(4,6,15,0.72)"; axx.fillRect(0, 0, W, H);
+    center(game.name, H / 2 - 34, 22, "#fff");
+    center("Enter \u2014 play again", H / 2 + 4, 16, "#7cffd0");
+    center("Esc \u2014 back to games", H / 2 + 30, 14, "rgba(200,220,255,0.6)");
+  }
+  function drawAttract(dt) {
+    attractT += dt;
+    clear("#05070f");
+    axx.fillStyle = "rgba(124,176,255,0.5)";
+    for (let i = 0; i < 26; i++) { const x = ((i * 53 + attractT * 40) % W), y = (i * 37) % H; axx.fillRect(x, y, 2, 2); }
+    center("JTC ARCADE", 110, 34, "#7cffd0");
+    center("6 games \u00b7 all original", 145, 14, "#9fb6d8");
+    if ((attractT % 1.2) < 0.7) center("\u25b6  CLICK TO PLAY  \u25c0", 200, 18, "#ffe24e");
+    center("Snake \u00b7 Breakout \u00b7 Pong \u00b7 2048 \u00b7 Asteroids \u00b7 Mines", H - 16, 11, "rgba(200,220,255,0.5)");
+  }
+
+  function engage() { active = true; view = "menu"; sel = 0; status("ARCADE \u00b7 \u2191/\u2193 pick \u00b7 Enter play \u00b7 Esc stand up"); }
+  function stand() { active = false; }
+  function click() { if (active) stand(); else engage(); }
+  function onKey(k) {
+    if (view === "menu") {
+      if (k === "arrowup" || k === "w") sel = (sel + games.length - 1) % games.length;
+      else if (k === "arrowdown" || k === "s") sel = (sel + 1) % games.length;
+      else if (k === "enter") { game = games[sel]; game.reset(); view = "game"; }
+      else if (k === "escape") stand();
+      return;
+    }
+    if (k === "escape") { view = "menu"; return; }
+    if (game && game.over) { if (k === "enter") game.reset(); return; }
+    if (game && game.key) game.key(k);
+  }
+  function tick(dt) {
+    arcadeTex.needsUpdate = true; blink += dt;
+    if (arcadeGlow) arcadeGlow.intensity = active ? 1.1 : (0.45 + 0.25 * Math.sin(blink * 3));
+    if (!active) { drawAttract(dt); return; }
+    if (view === "menu") { drawMenu(); return; }
+    if (game) { if (!game.over) game.step(dt); game.draw(); if (game.over) drawOver(); }
+  }
+
+  return { engage: engage, stand: stand, click: click, onKey: onKey, tick: tick, get active() { return active; } };
+})();
+/* ===================== END JTC ARCADE BLOCK ===================== */
     // ---------- controls ----------
     const cam={yaw:Math.PI,pitch:-0.05}, keys={};
     const player=new THREE.Vector3(0,2.3,4.6);
@@ -590,6 +1034,12 @@
     });
     window.addEventListener("keydown",function(e){ keys[e.key.toLowerCase()]=true; });
     window.addEventListener("keyup",function(e){ keys[e.key.toLowerCase()]=false; });
+    window.addEventListener("keydown",function(e){
+      if(!arcade.active) return;
+      var k=e.key.toLowerCase();
+      if(k==="arrowup"||k==="arrowdown"||k==="arrowleft"||k==="arrowright"||k===" "||k==="spacebar") e.preventDefault();
+      arcade.onKey(k);
+    });
     window.addEventListener("resize",function(){
       camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth,window.innerHeight);
@@ -600,8 +1050,9 @@
     const clock=new THREE.Clock(); const SPEED=5; applyPower();
     function frame(){
       const dt=Math.min(clock.getDelta(),0.05), t=clock.elapsedTime;
-      const fwd=(keys["s"]||keys["arrowdown"]?1:0)-(keys["w"]||keys["arrowup"]?1:0);
-      const str=(keys["a"]||keys["arrowleft"]?1:0)-(keys["d"]||keys["arrowright"]?1:0);
+      const lock=arcade.active;
+      const fwd=lock?0:((keys["s"]||keys["arrowdown"]?1:0)-(keys["w"]||keys["arrowup"]?1:0));
+      const str=lock?0:((keys["a"]||keys["arrowleft"]?1:0)-(keys["d"]||keys["arrowright"]?1:0));
       const s=Math.sin(cam.yaw), c=Math.cos(cam.yaw);
       player.x+=(fwd*-s+str*c)*SPEED*dt; player.z+=(fwd*-c-str*s)*SPEED*dt;
       player.x=THREE.MathUtils.clamp(player.x,-RW/2+1,RW/2-1);
@@ -614,7 +1065,7 @@
       );
       if(RGB) RGB.material.color.setHSL((t*0.08)%1,0.8,0.6);
       tvGlow.intensity = power.tv ? 1.2+Math.sin(t*8)*0.08 : 0;
-      drawScreen(t); drawWindow(dt);
+      drawScreen(t); drawWindow(dt); arcade.tick(dt);
       if(videoTex) videoTex.needsUpdate=true;
       renderer.render(scene,camera);
       if(cssRenderer) cssRenderer.render(cssScene,camera);
