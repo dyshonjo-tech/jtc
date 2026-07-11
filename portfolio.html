@@ -4,6 +4,8 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Work — JT Creations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -44,15 +46,15 @@
     .project-card:hover .project-thumb-overlay { background: rgba(26,25,22,0.08); }
     .view-btn { opacity: 0; transform: translateY(8px); transition: opacity 0.3s, transform 0.3s; background: var(--ink); color: var(--bg); padding: 12px 28px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
     .project-card:hover .view-btn { opacity: 1; transform: none; }
-    .thumb-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: clamp(32px, 5vw, 60px); font-weight: 300; letter-spacing: 0.08em; }
+    .thumb-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: clamp(32px, 5vw, 60px); font-weight: 300; letter-spacing: 0.08em; text-align: center; padding: 0 16px; }
     .tf-1 { background: linear-gradient(135deg, #4A2C17 0%, #8B5A2B 100%); color: rgba(255,220,170,0.18); }
-    .tf-2 { background: linear-gradient(135deg, #080709 0%, #16131a 100%); color: rgba(201,168,76,0.15); }
+    .tf-2 { background: linear-gradient(135deg, #C9A227 0%, #F4D160 100%); color: rgba(90,65,0,0.22); }
     .tf-3 { background: linear-gradient(135deg, #f5f0e8 0%, #c9a97a 100%); color: rgba(46,31,20,0.15); }
-    .tf-4 { background: linear-gradient(135deg, #FF8C00 0%, #D35400 100%); color: rgba((80,30,0,0.25); }
+    .tf-4 { background: linear-gradient(135deg, #FF8C00 0%, #D35400 100%); color: rgba(80,30,0,0.25); }
     .tf-5 { background: linear-gradient(135deg, #0b0b0b 0%, #2a1810 100%); color: rgba(255,107,26,0.18); }
     .tf-11 { background: linear-gradient(135deg, #3B0A0A 0%, #8B0000 100%); color: rgba(255,120,120,0.18); }
-    .tf-22 { background: linear-gradient(135deg, #1D4ED8 0%, #2e4a7a 55%, #000000 100%); color: rgba(200,168,75,0.22); }
-    .tf-14 {background: linear-gradient(135deg, #FF8C00 0%, #000000 100%); color: rgba(255,140,0,0.22); }
+    .tf-22 { background: linear-gradient(135deg, #0A1A3F 0%, #14213D 55%, #050912 100%); color: rgba(200,168,75,0.22); }
+    .tf-14 { background: linear-gradient(135deg, #FF6B1A 0%, #000000 100%); color: rgba(255,140,0,0.22); }
     .project-meta { display: flex; justify-content: space-between; align-items: flex-start; }
     .project-info h3 { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 400; margin-bottom: 6px; transition: color 0.2s; }
     .project-card:hover .project-info h3 { color: var(--accent); }
@@ -119,7 +121,7 @@
 
        <a href="https://enterpriseexclusiverides.org" target="_blank" class="project-card" data-tags="web-design development">
         <div class="project-thumb">
-          <div class="thumb-fallback tf-11" style="background-color: #AB2330;">Enterprise Exclusive Rides</div>
+          <div class="thumb-fallback tf-11">Enterprise Exclusive Rides</div>
           <div class="project-thumb-overlay"><div class="view-btn">View Site →</div></div>
         </div>
         <div class="project-meta">
