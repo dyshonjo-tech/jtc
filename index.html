@@ -60,6 +60,7 @@ nav ul {
   list-style: none;
   display: flex;
   gap: 40px;
+  align-items: center;
 }
 
 nav ul a {
@@ -72,6 +73,26 @@ nav ul a {
 }
 
 nav ul a:hover { color: var(--ink); }
+
+/* Nav call button */
+.nav-call {
+  color: var(--ink) !important;
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.nav-call:hover {
+  background: var(--ink);
+  color: var(--bg) !important;
+  border-color: var(--ink);
+}
+
+.nav-call svg { width: 12px; height: 12px; fill: var(--accent); flex-shrink: 0; }
+.nav-call:hover svg { fill: var(--accent); }
 
 /* ── HERO ── */
 .hero {
@@ -394,6 +415,26 @@ h2 {
 
 .contact-detail a:hover { color: var(--accent); }
 
+/* Phone gets top billing in the contact list */
+.contact-detail a.contact-phone {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  letter-spacing: 0.02em;
+  color: var(--white);
+}
+
+.contact-detail a.contact-phone::before { content: none; }
+.contact-detail a.contact-phone:hover { color: var(--accent); }
+
+.contact-phone-note {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-top: -8px;
+  margin-bottom: 4px;
+}
+
 .contact-form {
   display: flex;
   flex-direction: column;
@@ -457,6 +498,7 @@ footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
 }
 
 footer .logo { color: rgba(255,255,255,0.4); font-size: 18px; }
@@ -467,6 +509,17 @@ footer p {
   color: rgba(255,255,255,0.25);
   letter-spacing: 0.06em;
 }
+
+footer .footer-phone {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+footer .footer-phone:hover { color: var(--accent); }
 
 /* ── TESTIMONIALS ── */
 #testimonials {
@@ -565,6 +618,7 @@ footer p {
 @media (max-width: 900px) {
   nav { padding: 20px 24px; }
   nav ul { gap: 10px 20px; flex-wrap: wrap; justify-content: flex-end; }
+  .nav-call { padding: 6px 12px; }
   section { padding: 80px 24px; }
   .hero { padding: 0 24px 60px; }
   .services-header { grid-template-columns: 1fr; gap: 24px; }
@@ -573,10 +627,42 @@ footer p {
   .portfolio-item:first-child { grid-column: span 1; }
   .portfolio-item:first-child .portfolio-placeholder { aspect-ratio: 16/9; }
   .contact-layout { grid-template-columns: 1fr; gap: 48px; }
+  .contact-detail a.contact-phone { font-size: 30px; }
   .form-row { grid-template-columns: 1fr; }
   footer { flex-direction: column; gap: 12px; text-align: center; }
 }
 </style>
+
+<!-- STRUCTURED DATA — ties the phone number to the business for Google/Bing -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "JT Creations",
+  "description": "Veteran-owned web design and development studio in Las Vegas, NV. Custom websites, WordPress builds, and ongoing care plans.",
+  "url": "https://jtcreations.org",
+  "telephone": "+1-702-763-8145",
+  "email": "owner@jtcreations.org",
+  "priceRange": "$$",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Las Vegas",
+    "addressRegion": "NV",
+    "addressCountry": "US"
+  },
+  "areaServed": {
+    "@type": "Country",
+    "name": "United States"
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+1-702-763-8145",
+    "contactType": "sales",
+    "areaServed": "US",
+    "availableLanguage": "English"
+  }
+}
+</script>
 </head>
 <body>
 
@@ -590,6 +676,12 @@ footer p {
     <li><a href="emergency.html">Emergency</a></li>
     <li><a href="fivem.html">FiveM</a></li>
     <li><a href="#contact">Contact</a></li>
+    <li>
+      <a href="tel:+17027638145" class="nav-call">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1l-2.3 2.2z"/></svg>
+        (702) 763-8145
+      </a>
+    </li>
   </ul>
 </nav>
 
@@ -597,7 +689,7 @@ footer p {
 <section class="hero">
   <div class="hero-bg-text">Design</div>
   <div class="hero-content">
-    <div class="hero-tag">Web Design & Development</div>
+    <div class="hero-tag">Web Design &amp; Development</div>
     <h1>Websites built<br>to <em>make an impression.</em></h1>
     <p class="hero-sub">JT Creations crafts clean, purposeful websites for businesses, creators, and brands who want to stand out — without the noise.</p>
     <div class="hero-btns">
@@ -712,8 +804,10 @@ footer p {
   <h2 class="reveal">Ready to build<br>something?</h2>
   <div class="contact-layout">
     <div class="contact-info reveal">
-      <p>Got a project in mind? Fill out the form or reach out directly. I'll get back to you within 24 hours.</p>
+      <p>Got a project in mind? Call, email, or fill out the form. I'll get back to you within 24 hours.</p>
       <div class="contact-detail">
+        <div class="contact-phone-note">Call or text</div>
+        <a href="tel:+17027638145" class="contact-phone">(702) 763-8145</a>
         <a href="mailto:owner@jtcreations.org">owner@jtcreations.org</a>
         <a href="#">Las Vegas, NV — Available Remotely</a>
         <a href="#">Instagram · LinkedIn</a>
@@ -731,6 +825,10 @@ footer p {
         </div>
       </div>
       <div class="form-field">
+        <label>Phone</label>
+        <input type="tel" name="phone" placeholder="(702) 000-0000" />
+      </div>
+      <div class="form-field">
         <label>Project Type</label>
         <input type="text" name="project" placeholder="e.g. New website, redesign, landing page..." />
       </div>
@@ -746,7 +844,7 @@ footer p {
 <!-- FOOTER -->
 <footer>
   <a href="#" class="logo">JT <span>Creations</span></a>
-  <a href="tel:+17027638145">(702) 763-8145</a>
+  <a href="tel:+17027638145" class="footer-phone">(702) 763-8145</a>
   <p>© 2026 JT Creations · Las Vegas, NV</p>
 </footer>
 
